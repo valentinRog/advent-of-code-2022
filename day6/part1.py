@@ -1,7 +1,5 @@
 import sys
 
-i = N = 4
+N = 4
 data = sys.stdin.read().strip()
-while len(set(data[i - N:i])) != N:
-    i += 1
-print(i)
+print(next(i + N for i in range(len(data) - N) if len(set(data[i:i + N])) == N))

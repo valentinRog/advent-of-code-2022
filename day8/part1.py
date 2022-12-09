@@ -5,12 +5,13 @@ data = list(map(lambda x: list(map(lambda y: int(y), list(x))), sys.stdin.read()
 s = set()
 N = len(data)
 
-NORTH = ([(i, j) for i in range(N)] for j in range(N))
-SOUTH = ([(N - 1 - i, j) for i in range(N)] for j in range(N))
-WEST = ([(i, j) for j in range(N)] for i in range(N))
-EST = ([(i, N - 1 - j) for j in range(N)] for i in range(N))
+def north(i, j): return (i, j)
+def south(i, j): return (N - 1 - i, j)
+def west(i, j): return (j, i)
+def east(i, j): return (j, N - 1 - i)
+def g(f): return ([f(i, j) for i in range(N)] for j in range(N))
 
-for x in chain(NORTH, SOUTH, WEST, EST):
+for x in chain(g(north), g(south), g(west), g(east)):
     prev = -1
     for p in x:
         if data[p[0]][p[1]] > prev:

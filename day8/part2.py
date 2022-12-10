@@ -2,7 +2,7 @@ import sys
 from functools import reduce
 from itertools import takewhile
 
-data = list(map(lambda x: list(map(lambda y: int(y), list(x))), sys.stdin.read().splitlines()))
+data = list(map(lambda x: list(map(int, list(x))), sys.stdin.read().splitlines()))
 N = len(data)
 
 def north(i, j): return data[i][:j + 1][::-1]

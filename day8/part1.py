@@ -1,7 +1,7 @@
 import sys
 from itertools import chain
 
-data = list(map(lambda x: list(map(lambda y: int(y), list(x))), sys.stdin.read().splitlines()))
+data = list(map(lambda x: list(map(int, list(x))), sys.stdin.read().splitlines()))
 s = set()
 N = len(data)
 

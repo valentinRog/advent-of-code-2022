@@ -3,17 +3,9 @@ import sys
 x = 1
 v = []
 for line in sys.stdin.read().splitlines():
-    if line == "noop":
-        v.append(x)
-    else:
-        v.append(x)
-        v.append(x)
-        x += int(line.split()[1])
-
-for i, x in enumerate(v):
-    if abs(x - (i % 40)) < 2:
-        print("#", end="")
-    else:
-        print(".", end="")
-    if not (i + 1) % 40:
-        print()
+    v += [x] if line == "noop" else [x, x]
+    if line.startswith("add"):
+        x += int(line.split()[1]) 
+W = 40
+crt = ["#" if abs(x - i % W) <= 1 else "." for i, x in enumerate(v)]
+print("\n".join(map("".join, [crt[i:i + W] for i in range(0, len(crt), W)])))

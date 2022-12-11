@@ -2,17 +2,14 @@ import sys
 from math import prod
 
 
-def get_op(line):
-    o, v = line.split(":")[1].split()[-2:]
-    return {
-        "+": lambda x: x + int(v),
-        "*": lambda x: x * int(v),
-    }[o] if v != "old" else lambda x: x ** 2
+def op(line):
+    return lambda x: eval(" ".join(line.split()[-3:]).replace("old", str(x)))
+
 
 monkeys = [
     {
         "items": list(map(lambda x: int(x.strip()), monkey[1].split(":")[1].split(","))),
-        "operation": get_op(monkey[2]),
+        "operation": op(monkey[2]),
         "test": int(monkey[3].split()[-1]),
         "true": int(monkey[4].split()[-1]),
         "false": int(monkey[5].split()[-1]),

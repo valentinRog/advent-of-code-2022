@@ -1,38 +1,26 @@
 import sys
-from string import ascii_lowercase
 
 m = sys.stdin.read().strip()
-W = m.index("\n")
-H = len(m.splitlines())
-m = "".join(m.splitlines()) 
-S = m.index("S")
-E = m.index("E")
+W, H = m.index("\n"), m.count("\n")
+m = m.replace("\n", "")
+S, E = m.index("S"), m.index("E")
 m = m.replace("E", "z")
 m = m.replace("S", "a")
 
-arr = []
-def backtracking(p=S, s=None, n=0):
-    if s is None:
-        s = set()
-    s.add(p)
-    n += 1
-    if len(arr) and n > max(arr):
-        return False
-    if p == E:
-        arr.append(n)
-        return False
-    if p // W > 0 and ascii_lowercase.index(m[p]) + 1 >= ascii_lowercase.index(m[p - W]) and p - W not in s and backtracking(p - W, set(s), n):
-        return True
-    if p // W < H - 1 and ascii_lowercase.index(m[p]) + 1 >= ascii_lowercase.index(m[p + W]) and p + W not in s and backtracking(p + W, set(s), n):
-        return True
-    if p % W and ascii_lowercase.index(m[p]) + 1 >= ascii_lowercase.index(m[p - 1]) and p - 1 not in s and backtracking(p - 1, set(s), n):
-        return True
-        if len(arr) and n > max(arr):
-            return False
-    if p % W != W - 1 and ascii_lowercase.index(m[p]) + 1 >= ascii_lowercase.index(m[p + 1]) and p + 1 not in s and backtracking(p + 1, set(s), n):
-        return True
-    return False 
+fs = [
+    [lambda p: p - W, lambda p: p // W],
+    [lambda p: p + W, lambda p: p // W < H - 1],
+    [lambda p: p - 1, lambda p: p % W],
+    [lambda p: p + 1, lambda p: p % W != W - 1]
+]
 
-
-backtracking()
-print(min(arr) - 1 if len(arr) else "non")
+paths = [S]
+cost = [-1 if i != S else 0 for i in range(len(m))]
+while cost[E] == -1:
+    p = min([path for path in paths if cost[path] != -1], key=lambda path: cost[path])
+    for f in fs:
+        if f[1](p) and cost[f[0](p)] == -1 and ord(m[p]) + 1 >= ord(m[f[0](p)]):
+            paths.append(f[0](p))
+            cost[f[0](p)] = cost[p] + 1
+    paths.remove(p)
+print(cost[E])

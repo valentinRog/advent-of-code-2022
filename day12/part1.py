@@ -4,8 +4,7 @@ m = sys.stdin.read().strip()
 W, H = m.index("\n"), m.count("\n")
 m = m.replace("\n", "")
 S, E = m.index("S"), m.index("E")
-m = m.replace("E", "z")
-m = m.replace("S", "a")
+m = m.replace("S", "a").replace("E", "z")
 
 fs = [
     [lambda p: p - W, lambda p: p // W],

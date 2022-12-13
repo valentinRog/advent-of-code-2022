@@ -1,4 +1,5 @@
 import sys
+from itertools import takewhile
 
 data = [
     list(map(eval, line.split("\n")))
@@ -6,15 +7,9 @@ data = [
 ]
 
 def cmp(a, b):
-    if not isinstance(a, list) and not isinstance(b, list):
-        return a - b
-    if isinstance(a, int):
-        a = [a]
-    if isinstance(b, int):
-        b = [b]
-    for e1, e2 in zip(a, b):
-        if cmp(e1, e2):
-            return cmp(e1, e2)
-    return len(a) - len(b)
-
+    if int == type(a) == type(b):
+      return a - b
+    a, b = map(lambda x: [x] if type(x) == int else x, (a, b))
+    d = next((e for e in zip(a, b) if cmp(*e)), None)
+    return cmp(*d) if d is not None else len(a) - len(b)
 print(sum([i + 1 for i, e in enumerate(data) if cmp(*e) <= 0]))

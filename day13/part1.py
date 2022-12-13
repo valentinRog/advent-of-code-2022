@@ -1,5 +1,4 @@
 import sys
-from itertools import takewhile
 
 data = [
     list(map(eval, line.split("\n")))

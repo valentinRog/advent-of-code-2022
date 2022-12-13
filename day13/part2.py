@@ -1,9 +1,7 @@
 import sys
+from functools import cmp_to_key
 
-data = [
-    list(map(eval, line.split("\n")))
-    for line in sys.stdin.read().strip().split("\n\n")
-]
+data = list(map(eval, sys.stdin.read().strip().replace("\n\n", "\n").splitlines()))
 
 def cmp(a, b):
     if not isinstance(a, list) and not isinstance(b, list):
@@ -17,4 +15,6 @@ def cmp(a, b):
             return cmp(e1, e2)
     return len(a) - len(b)
 
-print(sum([i + 1 for i, e in enumerate(data) if cmp(*e) <= 0]))
+data += [[[2]], [[6]]]
+data = sorted(data, key=cmp_to_key(cmp))
+print((data.index([[2]]) + 1) * (data.index([[6]]) + 1))

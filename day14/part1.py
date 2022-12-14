@@ -1,43 +1,32 @@
 import sys
-from itertools import count
+import itertools
+from operator import itemgetter
 
 data = [
     [tuple(map(int, p.split(","))) for p in line.split(" -> ")]
      for line in sys.stdin.read().strip().splitlines()
 ]
 
-Y_MAX = max(max([p[1] for p in line]) for line in data)
-
 s = set()
 for line in data:
     for i in range(len(line) - 1):
-        px = sorted(line[i:i+2], key=lambda e: e[0])
-        px1 = px[0][0]
-        px2 = px[1][0]
-        py = sorted(line[i:i+2], key=lambda e: e[1])
-        py1 = py[0][1]
-        py2 = py[1][1]
-        for x in range(px1, px2 + 1):
-            s.add((x, py1))
-        for y in range(py1, py2 + 1):
-            s.add((px1, y))
+        px = sorted(map(itemgetter(0), line[i:i+2]))
+        py = sorted(map(itemgetter(1), line[i:i+2]))
+        for x in range(px[0], px[1] + 1):
+            s.add((x, py[0]))
+        for y in range(py[0], py[1] + 1):
+            s.add((px[0], y))
 
-n = 0
-while True:
-    sp = [500, 0]
-    while sp[1] != Y_MAX:
-        sp[1] += 1
-        if tuple(sp) not in s:
-            continue
-        elif (sp[0] - 1, sp[1]) not in s:
-            sp[0] -= 1
-        elif (sp[0] + 1, sp[1]) not in s:
-            sp[0] += 1
-        else:
-            sp[1] -= 1
-            break
-    if sp[1] == Y_MAX:
+Y_MAX = max(s, key=lambda x: x[1])[1]
+
+def fall(sp=(500, 0)):
+    for d in ((0, 1), (-1, 1), (1, 1)):
+        if (p := tuple(sum(x) for x in zip(sp, d))) not in s:
+            return fall(p) if p[1] < Y_MAX else p
+    return sp
+
+for n in itertools.count():
+    if (sp := fall())[1] == Y_MAX:
         break
-    s.add(tuple(sp))
-    n += 1
+    s.add(sp)
 print(n)

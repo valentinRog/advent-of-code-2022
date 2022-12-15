@@ -28,7 +28,7 @@ while y < ROW:
     while x < ROW:
         jump = 1
         stop = True
-        ds = [abs(d - line[2]) for line in data if (d := dist((x, y), line[0])) <= line[2]]
+        ds = [abs(d - line[2]) for line in data if (d := dist((x, y), line[0])) < line[2]]
         if not len(ds):
             print((x, y))
             print(4000000 * x + y)

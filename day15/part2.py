@@ -28,21 +28,14 @@ while y < ROW:
     while x < ROW:
         jump = 1
         stop = True
-        for line in data:
-            if (d1 := dist((x, y), line[0])) <= (d2 := line[2]):
-                stop = False
-                d = abs(d1 - d2)
-                if d > jump:
-                    jump = d
-        x += jump
-        if jumpy == -1 or jump < jumpy:
-            jumpy = jump
-        if stop:
-            print()
+        ds = [abs(d - line[2]) for line in data if (d := dist((x, y), line[0])) <= line[2]]
+        if not len(ds):
+            print((x, y))
             print(4000000 * x + y)
             exit()
+        x += max(ds) or 1
+        jump = max(ds) or 1
+        if jumpy == -1 or jump < jumpy:
+            jumpy = jump
         x += 1
-    if jumpy >= 4:
-        y += jumpy >> 1
-    else:
-        y += 1
+    y += jumpy >> 1 or 1

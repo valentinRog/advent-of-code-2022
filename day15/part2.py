@@ -15,12 +15,6 @@ for line in sys.stdin.read().strip().splitlines():
         "=")[-1].replace(",", "").replace(":", ""), points))
     data.append(((sx, sy), (bx, by), dist((sx, sy), (bx, by))))
 
-sensor = set()
-beacon = set()
-for line in data:
-    sensor.add(line[0])
-    beacon.add(line[1])
-
 
 def addt(t1, t2):
     return tuple(sum(e) for e in zip(t1, t2))

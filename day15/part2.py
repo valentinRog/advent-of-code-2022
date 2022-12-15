@@ -21,7 +21,7 @@ def addt(t1, t2):
 def xjump(p):
     start = p[0]
     b, d = next(((line[0], line[2]) for line in data if dist(p, line[0]) <= line[2]))
-    return b[0] - p[0] + d - abs(p[1] - b[1]) + 1
+    return min(b[0] - p[0] + d - abs(p[1] - b[1]) + 1, ROW)
 
 def dist_to_border_max(p):
     return max([abs(d - line[2]) for line in data if (d := dist(p, line[0])) <= line[2]])

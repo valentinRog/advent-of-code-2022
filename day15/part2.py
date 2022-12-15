@@ -1,6 +1,7 @@
 import sys
 
 ROW = 4000000
+# ROW = 20
 
 data = []
 
@@ -28,7 +29,7 @@ while y < ROW:
     while x < ROW:
         jump = 1
         stop = True
-        ds = [abs(d - line[2]) for line in data if (d := dist((x, y), line[0])) < line[2]]
+        ds = [abs(d - line[2]) for line in data if (d := dist((x, y), line[0])) <= line[2]]
         if not len(ds):
             print((x, y))
             print(4000000 * x + y)
@@ -37,5 +38,4 @@ while y < ROW:
         jump = max(ds) or 1
         if jumpy == -1 or jump < jumpy:
             jumpy = jump
-        x += 1
     y += jumpy >> 1 or 1

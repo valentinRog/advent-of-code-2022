@@ -1,7 +1,6 @@
 import sys
 
 ROW = 4000000
-# ROW = 20
 
 data = []
 
@@ -29,7 +28,6 @@ def dist_to_border_max(p):
 
 y = 0
 while y < ROW:
-    print(y, end="\r")
     x = 0
     arr = []
     while x < ROW:

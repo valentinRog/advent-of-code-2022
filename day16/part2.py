@@ -27,12 +27,7 @@ def best(t=0, valve="AA", opened=None):
     return score + s2, back2
 
 score, opened = best()
-print(score)
-print(opened)
-
 for e in opened:
     data[e]["rate"] = 0
 best.cache_clear()
-score2, opened = best()
-print(opened)
-print(score + score2)
+print(score + best()[0])

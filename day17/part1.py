@@ -1,8 +1,9 @@
 import sys
-from operator import getitem
 import itertools
 
 data = sys.stdin.read().strip()
+
+N_ROCK = int(1e4)
 
 rocks = [
     {(0, 0), (1, 0), (2, 0), (3, 0)},
@@ -16,16 +17,6 @@ s = set()
 
 def falling0():
     return (2, max((p[1] + 1 for p in s), default=0) + 3)
-
-def print_config(s):
-    for y in reversed(range(30)):
-        for x in range(7):
-            if (x, y) in s:
-                print("#", end="")
-            else:
-                print(".", end="")
-        print()
-    print("-------")
 
 def addt(t1, t2):
     return (t1[0] + t2[0], t1[1] + t2[1])
@@ -51,28 +42,37 @@ def right(rock):
             return {addt(p, (1, 0)) for p in rock}
     return rock
 
+def minimize():
+    conf = tuple(max((p[1] for p in s if p[0] == x), default=0) for x in range(7))
+    h_min = min(conf) - 5
+    return set((p for p in s if p[1] > h_min)) if h_min > 0 else s
+
+def hg():
+    return max((p[1] for p in s), default=0) + 1
+
 move = {
     "<": left,
     ">": right
 }
 
-it = itertools.cycle(iter(data))
-i = 0
-for rock in itertools.cycle(rocks):
+def drop(rock, it):
     rock = {addt(p, falling0()) for p in rock}
     while True:
         dir = next(it)
         rock = move[dir](rock)
-        # print_config(s | rock)
         try:
             rock = down(rock)
         except:
             break
-        # print_config(s | rock)
-    s |= rock
-    print(i, end="\r")
-    i += 1
-    if i == 2022:
-        break
+    return rock
 
-print(max(p[1] for p in s) + 1)
+
+it = itertools.cycle(iter(data))
+it_rock = itertools.cycle(iter(rocks))
+i = N_ROCK
+while i:
+    s |= drop(next(it_rock), it)
+    s = minimize()
+    print(i, end="\r")
+    i -= 1
+print(hg())

@@ -3,7 +3,7 @@ import itertools
 
 data = sys.stdin.read().strip()
 
-N_ROCK = int(1e4)
+N_ROCK = 2022
 
 rocks = [
     {(0, 0), (1, 0), (2, 0), (3, 0)},

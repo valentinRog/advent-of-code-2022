@@ -30,7 +30,7 @@ def best(
         geode_rob=0,
         t=0):
 
-    if t == 24:
+    if t == 32:
         return geode
     arr = []
 
@@ -136,9 +136,9 @@ def best(
     return max(arr)
 
 
-res = 0
+res = 1
 for i, line in enumerate(data, 1):
-    res += i * best(
+    res *= best(
         line["ore"],
         line["clay"],
         line["obsidian"][0],
@@ -147,4 +147,6 @@ for i, line in enumerate(data, 1):
         line["geode"][1],
     )
     best.cache_clear()
+    if i == 3:
+        break
 print(res)

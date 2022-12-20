@@ -3,7 +3,7 @@ from collections import deque
 
 data = list(map(int , sys.stdin.read().split()))
 
-arr = deque((e[0], e[1]) for e in enumerate(data))
+arr = deque(e for e in enumerate(data))
 
 def r():
     global arr

@@ -1,81 +1,64 @@
 import sys
+from operator import itemgetter
 
-data = [
+data = {
     tuple(map(int, line.split(",")))
     for line in sys.stdin.read().strip().splitlines()
-]
-
-sides = {
-    (-1, 0 ,0),
-    (1, 0 ,0),
-    (0, -1 ,0),
-    (0, 1 ,0),
-    (0, 0 , -1),
-    (0, 0 ,1),
 }
 
-def addt(t1, t2):
-    return tuple(sum(e) for e in zip(t1, t2))
+sides = (
+    (-1, 0, 0),
+    (1, 0, 0),
+    (0, -1, 0),
+    (0, 1, 0),
+    (0, 0, -1),
+    (0, 0, 1),
+)
 
-def connected(p1, p2):
-    for side in sides:
-        for p in p1:
-            if addt(p, side) in p2:
-                return True
-    return False
 
-air_blocks = set()
-def touching_faces(p):
-    faces = 6
-    for side in sides:
-        for x in data:
-            if addt(p, side) == x:
-                faces -= 1
-                break
-        else:
-            air_blocks.add(addt(p, side))
-    return faces
+def add(*t): return tuple(sum(e) for e in zip(*t))
 
-r1 = sum(touching_faces(p) for p in data)
 
-def create_block(p, blocks):
-    s = {p}
-    prev = -1
-    while prev != len(blocks):
-        prev = len(blocks)
-        for b in blocks:
-            if connected(s, {b}):
-                s.add(b)
-                blocks.remove(b)
-    return s
+def faces(p): return sum(add(p, side) not in data for side in sides)
 
-def expand_air(ab):
-    res = set()
-    for b in ab:
-        res.add(b)
-        for side in sides:
-            if addt(b, side) not in data:
-                res.add(addt(b, side))
-    return res
 
-air_blocks = expand_air(air_blocks)
+def connected_air_blocks(p):
+    return {a for side in sides if (a := add(p, side)) not in data}
 
-arr = []
-done = set()
-for i, p in enumerate(air_blocks):
-    if p not in done:
-        arr.append(create_block(p, list(air_blocks)))
-    done |= arr[-1]
 
-ext_len = max(len(x) for x in arr)
-yo = set()
-for s in arr:
-    if len(s) < ext_len:
-        yo |= s
+def expand(p): return {p} | {add(p, side) for side in sides}
 
-res = 0
-for p in yo:
-    for side in sides:
-        if addt(p, side) in data:
-            res += 1
-print(r1 - res)
+
+def create_block(p, blocks, block=None):
+    if block is None:
+        block = [{p}, expand(p)]
+    try:
+        for b in (b for b in blocks if b in block[1]):
+            block[0].add(b)
+            block[1] |= expand(b)
+        return create_block(p, blocks - block[0], block)
+    except:
+        return block[0]
+
+
+def create_blocks(blocks):
+    while blocks:
+        blocks -= (block := create_block(next(iter(blocks)), blocks))
+        yield block
+
+
+air_blocks = set().union(*(connected_air_blocks(p) for p in data))
+air_blocks |= {
+    np
+    for side in sides for p in air_blocks if (np := add(p, side)) not in data
+}
+
+y_max = max(air_blocks, key=itemgetter(1))
+trapped_air_blocks = set().union(
+    *(filter(lambda b: y_max not in b, create_blocks(air_blocks)))
+)
+
+print(
+    sum(faces(p) for p in data)
+    - sum(add(p, side) in data for p in trapped_air_blocks for side in sides)
+)

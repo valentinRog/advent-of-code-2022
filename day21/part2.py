@@ -17,6 +17,5 @@ def compute(k):
     return f"({' '.join(op)})"
 
 x1, _,  x2 = data["root"].split()
-lhs = eval(compute(x1))
-rhs = eval(compute(x2))
-print(math.floor(abs((rhs.real - lhs.real) / (lhs.imag or rhs.imag))))
+z = eval(compute(x1)) - eval(compute(x2))
+print(math.floor(abs(z / z.imag)))

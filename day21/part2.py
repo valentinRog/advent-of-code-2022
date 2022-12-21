@@ -9,13 +9,13 @@ data = {
 
 def compute(k):
     if k == "humn":
-        return str(0 + 1j)
+        return 1j
     if len((op := data[k].split())) == 3:
         for i in (0, 2):
             if op[i] in data.keys():
                 op[i] = str(compute(op[i]))
-    return f"({' '.join(op)})"
+    return eval(" ".join(op))
 
 x1, _,  x2 = data["root"].split()
-z = eval(compute(x1)) - eval(compute(x2))
+z = compute(x1) - compute(x2)
 print(math.floor(abs(z / z.imag)))

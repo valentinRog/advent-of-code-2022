@@ -12,8 +12,7 @@ def compute(k):
         return 1j
     if len((op := data[k].split())) == 3:
         for i in (0, 2):
-            if op[i] in data.keys():
-                op[i] = str(compute(op[i]))
+            op[i] = str(compute(op[i]))
     return eval(" ".join(op))
 
 x1, _,  x2 = data["root"].split()

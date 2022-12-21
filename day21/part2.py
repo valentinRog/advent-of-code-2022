@@ -18,4 +18,4 @@ def compute(k):
 
 x1, _,  x2 = data["root"].split()
 z = compute(x1) - compute(x2)
-print(math.floor(abs(z / z.imag)))
+print(math.floor(abs(z.real / z.imag)))

@@ -1,15 +1,22 @@
 import sys
+import math
 
 data = {
     (e := line.strip().split(":"))[0]: e[1]
     for line in sys.stdin.read().strip().splitlines()
 }
 
+
 def compute(k):
+    if k == "humn":
+        return str(0 + 1j)
     if len((op := data[k].split())) == 3:
         for i in (0, 2):
             if op[i] in data.keys():
                 op[i] = str(compute(op[i]))
-    return int(eval(" ".join(op)))
+    return f"({' '.join(op)})"
 
-print(compute("root"))
+x1, _,  x2 = data["root"].split()
+lhs = eval(compute(x1))
+rhs = eval(compute(x2))
+print(math.floor(abs((rhs.real - lhs.real) / (lhs.imag or rhs.imag))))

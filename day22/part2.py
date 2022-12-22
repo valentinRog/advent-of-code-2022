@@ -56,35 +56,61 @@ def face(p):
     )
 
 
+def transform(p, fi, ff):
+    x, y = int(p.real) % TILE, int(p.imag) % TILE
+    return {
+        (1, 2): (complex(TILE - 1 - x, 0) + fcs[2][0], 1j),
+        (1, 3): (complex(TILE - 1 - y, 0) + fcs[3][0], 1j),
+        (1, 6): (complex(TILE - 1, TILE - 1 - y) + fcs[6][0], -1),
+        (2, 1): (complex(TILE - 1 - x, 0) + fcs[1][0], 1j),
+        (2, 5): (complex(TILE - 1 - x, TILE - 1) + fcs[5][0], -1j),
+        (2, 6): (complex(TILE - 1 - y, TILE - 1), -1j),
+        (3, 1): (complex(0, x) + fcs[1][0], 1),
+        (3, 5): (complex(0, TILE - 1 - x) + fcs[5][0], 1),
+        (4, 6): (complex(TILE - 1 - y, 0) + fcs[6][0], 1j),
+        (5, 2): (complex(TILE - 1 - x, TILE - 1) + fcs[2][0], -1j),
+        (5, 3): (complex(TILE - 1 - y, TILE - 1) + fcs[3][0], -1j),
+        (6, 1): (complex(TILE - 1, TILE - 1 - y) + fcs[1][0], -1),
+        (6, 2): (complex(0, TILE - 1 - x) + fcs[2][0], 1),
+        (6, 4): (complex(TILE - 1, TILE - 1 - x) + fcs[4][0], -1),
+    }[(fi, ff)]
 
-def transform(p, f1, f2, d1, d2):
-    if d1 == d2:
-        return complex(int(p.real) % TILE, int(p.imag) % TILE) + fcs[f2][1]
-    if d1 == -d2:
-        return complex(TILE - 1 - int(p.real) % TILE, TILE - 1 - int(p.imag) % TILE) + fcs[f2][0]
-    if (dir.index(d1) + 1) % len(dir) == d2:
-        return complex(int(p.imag) % TILE, int(p.real) % TILE) + fcs[f2][1]
-    return complex(TILE - 1 - int(p.imag) % TILE, TILE - 1 - int(p.real) % TILE) + fcs[f2][0]
 
-for y in range(1 + max(map(lambda z: int(z.imag), s))):
-    for x in range(1 + max(map(lambda z: int(z.real), s))):
-        if complex(x, y) in s:
-            if complex(x, y) == p:
-                print("p", end="")
+def printm():
+    for y in range(1 + max(map(lambda z: int(z.imag), s))):
+        for x in range(1 + max(map(lambda z: int(z.real), s))):
+            if complex(x, y) in s:
+                if complex(x, y) == p:
+                    print("p", end="")
+                else:
+                    print(face(complex(x, y)), end="")
             else:
-                print(face(complex(x, y)), end="")
-        else:
-            print(" ", end="")
+                print(" ", end="")
+        print()
     print()
 
+
+printm()
+p += d
+p += d
+p += d
+p, d = transform(p, 1, 6)
+
+printm()
+
+# for _ in range(7):
+#     p += d
+
+# p = transform(p, 5, 3, d, -1j)
+# d = -1j
+# for _ in range(3):
+#     p += d
+
+# p = transform(p, 3, 1, d, 1)
+# d = 1
+
 exit()
-
-conversions = {
-    (1, 2): lambda p: (TILE - 1 - complex(int(p.real) % TILE, fcs[2][0].imag), 1j),
-    (1, 3): lambda p: (complex(int(p.imag) % TILE + fcs[3][1].real, fcs[3][0].imag), 1j),
-    (1, 6): lambda p: (complex(fcs[6][1].real, fcs[6][0].imag + TILE - 1 - int(p.imag) % TILE), -1),
-}
-
+#######################################
 
 def move(p, d):
     if p + d in rock:

@@ -41,7 +41,7 @@ TILE = 4
 
 fcs = {
     1: complex(2 * TILE, 0),
-    2: complex(0, TILE - 1),
+    2: complex(0, TILE),
     3: complex(TILE, TILE),
     4: complex(2 * TILE, TILE),
     5: complex(2 * TILE, 2 * TILE),
@@ -54,6 +54,25 @@ def face(p):
         k for k, v in fcs.items()
         if v.real <= p.real < v.real + TILE and v.imag <= p.imag < v.imag + TILE
     )
+
+
+def getff(fi, d):
+    return {
+        (1, -1): 3,
+        (1, -1j): 2,
+        (1, 1): 6,
+        (2, -1): 6,
+        (2, -1j): 1,
+        (2, 1j): 5,
+        (3, -1j): 1,
+        (3, 1j): 5,
+        (4, 1): 6,
+        (5, -1): 3,
+        (5, 1j): 2,
+        (6, 1j): 2,
+        (6, -1j): 4,
+        (6, 1): 1,
+    }[(fi, d)]
 
 
 def transform(p, fi, ff):
@@ -90,27 +109,28 @@ def printm():
     print()
 
 
-printm()
-p += d
-p += d
-p += d
-p, d = transform(p, 1, 6)
+# printm()
+# p += d
+# p += d
+# p += d
+# p, d = transform(p, face(p), getff(face(p), d))
 
-printm()
+# printm()
 
-# for _ in range(7):
-#     p += d
+# # for _ in range(7):
+# #     p += d
 
-# p = transform(p, 5, 3, d, -1j)
-# d = -1j
-# for _ in range(3):
-#     p += d
+# # p = transform(p, 5, 3, d, -1j)
+# # d = -1j
+# # for _ in range(3):
+# #     p += d
 
-# p = transform(p, 3, 1, d, 1)
-# d = 1
+# # p = transform(p, 3, 1, d, 1)
+# # d = 1
 
-exit()
+# exit()
 #######################################
+
 
 def move(p, d):
     if p + d in rock:
@@ -118,40 +138,17 @@ def move(p, d):
     if p + d in s:
         return p + d, d
 
-    x, y = int(p.real), int(p.imag)
-
-    if face(p) == 1:
-        if d == 1:
-            p2 = p + complex(TILE, )
-            d2 = -1
-            pass
-        if d == -1j:
-            p2 = p + complex(-2 * TILE, TILE)
-            d2 = 1j
-            return (p2, d2) if p2 not in rock else (p, d)
-        if d == -1:
-            pass
-    if face(p) == 2:
-        pass
-    if face(p) == 3:
-        pass
-    if face(p) == 4:
-        pass
-    if face(p) == 5:
-        pass
-    if face(p) == 6:
-        pass
+    p2, d2 = transform(p, face(p), getff(face(p), d))
+    if p2 not in rock:
+        return p2, d2
     return p, d
 
 
-print(p)
-print()
 acc = ""
 for c in path:
     if not c.isdigit():
         for _ in range(int(acc)):
             p, d = move(p, d)
-            print(p)
     if c == "R":
         acc = ""
         d = rr()
@@ -160,8 +157,13 @@ for c in path:
         d = rl()
     else:
         acc += c
+
 for _ in range(int(acc)):
     p, d = move(p, d)
 
 p += 1 + 1j
+
+if d.imag:
+    d = -d
+
 print(1000 * int(p.imag) + 4 * int(p.real) + dir.index(d))

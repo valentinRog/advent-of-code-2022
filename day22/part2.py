@@ -40,39 +40,39 @@ def rr(): return dir[dir.index(d) - 1]
 TILE = 4
 
 fcs = {
-    1: (complex(2 * TILE, 0), complex(3 * TILE - 1, TILE - 1)),
-    2: (complex(0, TILE - 1), complex(TILE - 1, 2 * TILE - 1)),
-    3: (complex(TILE, TILE), complex(2 * TILE - 1, 2 * TILE - 1)),
-    4: (complex(2 * TILE, TILE), complex(3 * TILE - 1, 2 * TILE - 1)),
-    5: (complex(2 * TILE, 2 * TILE), complex(3 * TILE - 1, 3 * TILE - 1)),
-    6: (complex(3 * TILE, 2 * TILE), complex(4 * TILE - 1, 3 * TILE - 1)),
+    1: complex(2 * TILE, 0),
+    2: complex(0, TILE - 1),
+    3: complex(TILE, TILE),
+    4: complex(2 * TILE, TILE),
+    5: complex(2 * TILE, 2 * TILE),
+    6: complex(3 * TILE, 2 * TILE),
 }
 
 
 def face(p):
     return next(
         k for k, v in fcs.items()
-        if v[0].real <= p.real <= v[1].real and v[0].imag <= p.imag <= v[1].imag
+        if v.real <= p.real < v.real + TILE and v.imag <= p.imag < v.imag + TILE
     )
 
 
 def transform(p, fi, ff):
     x, y = int(p.real) % TILE, int(p.imag) % TILE
     return {
-        (1, 2): (complex(TILE - 1 - x, 0) + fcs[2][0], 1j),
-        (1, 3): (complex(TILE - 1 - y, 0) + fcs[3][0], 1j),
-        (1, 6): (complex(TILE - 1, TILE - 1 - y) + fcs[6][0], -1),
-        (2, 1): (complex(TILE - 1 - x, 0) + fcs[1][0], 1j),
-        (2, 5): (complex(TILE - 1 - x, TILE - 1) + fcs[5][0], -1j),
+        (1, 2): (complex(TILE - 1 - x, 0) + fcs[2], 1j),
+        (1, 3): (complex(TILE - 1 - y, 0) + fcs[3], 1j),
+        (1, 6): (complex(TILE - 1, TILE - 1 - y) + fcs[6], -1),
+        (2, 1): (complex(TILE - 1 - x, 0) + fcs[1], 1j),
+        (2, 5): (complex(TILE - 1 - x, TILE - 1) + fcs[5], -1j),
         (2, 6): (complex(TILE - 1 - y, TILE - 1), -1j),
-        (3, 1): (complex(0, x) + fcs[1][0], 1),
-        (3, 5): (complex(0, TILE - 1 - x) + fcs[5][0], 1),
-        (4, 6): (complex(TILE - 1 - y, 0) + fcs[6][0], 1j),
-        (5, 2): (complex(TILE - 1 - x, TILE - 1) + fcs[2][0], -1j),
-        (5, 3): (complex(TILE - 1 - y, TILE - 1) + fcs[3][0], -1j),
-        (6, 1): (complex(TILE - 1, TILE - 1 - y) + fcs[1][0], -1),
-        (6, 2): (complex(0, TILE - 1 - x) + fcs[2][0], 1),
-        (6, 4): (complex(TILE - 1, TILE - 1 - x) + fcs[4][0], -1),
+        (3, 1): (complex(0, x) + fcs[1], 1),
+        (3, 5): (complex(0, TILE - 1 - x) + fcs[5], 1),
+        (4, 6): (complex(TILE - 1 - y, 0) + fcs[6], 1j),
+        (5, 2): (complex(TILE - 1 - x, TILE - 1) + fcs[2], -1j),
+        (5, 3): (complex(TILE - 1 - y, TILE - 1) + fcs[3], -1j),
+        (6, 1): (complex(TILE - 1, TILE - 1 - y) + fcs[1], -1),
+        (6, 2): (complex(0, TILE - 1 - x) + fcs[2], 1),
+        (6, 4): (complex(TILE - 1, TILE - 1 - x) + fcs[4], -1),
     }[(fi, ff)]
 
 

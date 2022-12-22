@@ -51,4 +51,6 @@ for _ in range(int(acc)):
     p = move()
 
 p += 1 + 1j
+if d.imag:
+    d = -d
 print(1000 * int(p.imag) + 4 * int(p.real) + dir.index(d))

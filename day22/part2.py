@@ -22,30 +22,26 @@ def rl(): return dir[(dir.index(d) + 1) % len(dir)]
 def rr(): return dir[dir.index(d) - 1]
 
 
-#         1111
-#         1111
-#         1111
-#         1111
-# 222233334444
-# 222233334444
-# 222233334444
-# 222233334444
-#         55556666
-#         55556666
-#         55556666
-#         55556666
-
 # hardcoding for the win, don't do this at home
 
-TILE = 4
+# TILE = 4
+TILE = 50
 
+# fcs = {
+#     1: complex(2 * TILE, 0),
+#     2: complex(0, TILE),
+#     3: complex(TILE, TILE),
+#     4: complex(2 * TILE, TILE),
+#     5: complex(2 * TILE, 2 * TILE),
+#     6: complex(3 * TILE, 2 * TILE),
+# }
 fcs = {
-    1: complex(2 * TILE, 0),
-    2: complex(0, TILE),
+    1: complex(TILE, 0),
+    2: complex(2 * TILE, 0),
     3: complex(TILE, TILE),
-    4: complex(2 * TILE, TILE),
-    5: complex(2 * TILE, 2 * TILE),
-    6: complex(3 * TILE, 2 * TILE),
+    4: complex(0, 2 * TILE),
+    5: complex(TILE, 2 * TILE),
+    6: complex(0, 3 * TILE),
 }
 
 
@@ -55,81 +51,82 @@ def face(p):
         if v.real <= p.real < v.real + TILE and v.imag <= p.imag < v.imag + TILE
     )
 
+# def getff(fi, d):
+#     return {
+#         (1, -1): 3,
+#         (1, -1j): 2,
+#         (1, 1): 6,
+#         (2, -1): 6,
+#         (2, -1j): 1,
+#         (2, 1j): 5,
+#         (3, -1j): 1,
+#         (3, 1j): 5,
+#         (4, 1): 6,
+#         (5, -1): 3,
+#         (5, 1j): 2,
+#         (6, 1j): 2,
+#         (6, -1j): 4,
+#         (6, 1): 1,
+#     }[(fi, d)]
+
 
 def getff(fi, d):
     return {
-        (1, -1): 3,
-        (1, -1j): 2,
-        (1, 1): 6,
-        (2, -1): 6,
-        (2, -1j): 1,
-        (2, 1j): 5,
-        (3, -1j): 1,
-        (3, 1j): 5,
-        (4, 1): 6,
-        (5, -1): 3,
-        (5, 1j): 2,
+        (1, -1): 4,
+        (1, -1j): 6,
+        (2, -1j): 6,
+        (2, 1): 5,
+        (2, 1j): 3,
+        (3, -1): 4,
+        (3, 1): 2,
+        (4, -1): 1,
+        (4, -1j): 3,
+        (5, 1): 2,
+        (5, 1j): 6,
+        (6, -1): 1,
         (6, 1j): 2,
-        (6, -1j): 4,
-        (6, 1): 1,
+        (6, 1): 5,
     }[(fi, d)]
 
+
+# def transform(p, fi, ff):
+#     x, y = int(p.real) % TILE, int(p.imag) % TILE
+#     return {
+#         (1, 2): (complex(TILE - 1 - x, 0) + fcs[2], 1j),
+#         (1, 3): (complex(TILE - 1 - y, 0) + fcs[3], 1j),
+#         (1, 6): (complex(TILE - 1, TILE - 1 - y) + fcs[6], -1),
+#         (2, 1): (complex(TILE - 1 - x, 0) + fcs[1], 1j),
+#         (2, 5): (complex(TILE - 1 - x, TILE - 1) + fcs[5], -1j),
+#         (2, 6): (complex(TILE - 1 - y, TILE - 1), -1j),
+#         (3, 1): (complex(0, x) + fcs[1], 1),
+#         (3, 5): (complex(0, TILE - 1 - x) + fcs[5], 1),
+#         (4, 6): (complex(TILE - 1 - y, 0) + fcs[6], 1j),
+#         (5, 2): (complex(TILE - 1 - x, TILE - 1) + fcs[2], -1j),
+#         (5, 3): (complex(TILE - 1 - y, TILE - 1) + fcs[3], -1j),
+#         (6, 1): (complex(TILE - 1, TILE - 1 - y) + fcs[1], -1),
+#         (6, 2): (complex(0, TILE - 1 - x) + fcs[2], 1),
+#         (6, 4): (complex(TILE - 1, TILE - 1 - x) + fcs[4], -1),
+#     }[(fi, ff)]
 
 def transform(p, fi, ff):
     x, y = int(p.real) % TILE, int(p.imag) % TILE
     return {
-        (1, 2): (complex(TILE - 1 - x, 0) + fcs[2], 1j),
-        (1, 3): (complex(TILE - 1 - y, 0) + fcs[3], 1j),
-        (1, 6): (complex(TILE - 1, TILE - 1 - y) + fcs[6], -1),
-        (2, 1): (complex(TILE - 1 - x, 0) + fcs[1], 1j),
-        (2, 5): (complex(TILE - 1 - x, TILE - 1) + fcs[5], -1j),
-        (2, 6): (complex(TILE - 1 - y, TILE - 1), -1j),
-        (3, 1): (complex(0, x) + fcs[1], 1),
-        (3, 5): (complex(0, TILE - 1 - x) + fcs[5], 1),
-        (4, 6): (complex(TILE - 1 - y, 0) + fcs[6], 1j),
-        (5, 2): (complex(TILE - 1 - x, TILE - 1) + fcs[2], -1j),
-        (5, 3): (complex(TILE - 1 - y, TILE - 1) + fcs[3], -1j),
-        (6, 1): (complex(TILE - 1, TILE - 1 - y) + fcs[1], -1),
-        (6, 2): (complex(0, TILE - 1 - x) + fcs[2], 1),
-        (6, 4): (complex(TILE - 1, TILE - 1 - x) + fcs[4], -1),
+        (1, 4): (complex(0, TILE - 1 - y) + fcs[4], 1),
+        (1, 6): (complex(0, x) + fcs[6], 1),
+        (2, 3): (complex(TILE - 1, x) + fcs[3], -1),
+        (2, 5): (complex(TILE - 1, TILE - 1 - y) + fcs[5], -1),
+        (2, 6): (complex(x, TILE - 1) + fcs[6], -1j),
+        (3, 2): (complex(y, TILE - 1) + fcs[2], -1j),
+        (3, 4): (complex(y, 0) + fcs[4], 1j),
+        (4, 1): (complex(0, TILE - 1 - y) + fcs[1], 1),
+        (4, 3): (complex(0, x) + fcs[3], 1),
+        (5, 2): (complex(TILE - 1, TILE - 1 - y) + fcs[2], -1),
+        (5, 6): (complex(TILE - 1, x) + fcs[6], -1),
+        (6, 1): (complex(y, 0) + fcs[1], 1j),
+        (6, 2): (complex(x, 0) + fcs[2], 1j),
+        (6, 5): (complex(y, TILE - 1) + fcs[5], -1j),
+
     }[(fi, ff)]
-
-
-def printm():
-    for y in range(1 + max(map(lambda z: int(z.imag), s))):
-        for x in range(1 + max(map(lambda z: int(z.real), s))):
-            if complex(x, y) in s:
-                if complex(x, y) == p:
-                    print("p", end="")
-                else:
-                    print(face(complex(x, y)), end="")
-            else:
-                print(" ", end="")
-        print()
-    print()
-
-
-# printm()
-# p += d
-# p += d
-# p += d
-# p, d = transform(p, face(p), getff(face(p), d))
-
-# printm()
-
-# # for _ in range(7):
-# #     p += d
-
-# # p = transform(p, 5, 3, d, -1j)
-# # d = -1j
-# # for _ in range(3):
-# #     p += d
-
-# # p = transform(p, 3, 1, d, 1)
-# # d = 1
-
-# exit()
-#######################################
 
 
 def move(p, d):
@@ -162,8 +159,6 @@ for _ in range(int(acc)):
     p, d = move(p, d)
 
 p += 1 + 1j
-
 if d.imag:
     d = -d
-
 print(1000 * int(p.imag) + 4 * int(p.real) + dir.index(d))

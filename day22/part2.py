@@ -56,10 +56,23 @@ def face(p):
     )
 
 
+
+def transform(p, f1, f2, d1, d2):
+    if d1 == d2:
+        return complex(int(p.real) % TILE, int(p.imag) % TILE) + fcs[f2][1]
+    if d1 == -d2:
+        return complex(TILE - 1 - int(p.real) % TILE, TILE - 1 - int(p.imag) % TILE) + fcs[f2][0]
+    if (dir.index(d1) + 1) % len(dir) == d2:
+        return complex(int(p.imag) % TILE, int(p.real) % TILE) + fcs[f2][1]
+    return complex(TILE - 1 - int(p.imag) % TILE, TILE - 1 - int(p.real) % TILE) + fcs[f2][0]
+
 for y in range(1 + max(map(lambda z: int(z.imag), s))):
     for x in range(1 + max(map(lambda z: int(z.real), s))):
         if complex(x, y) in s:
-            print(face(complex(x, y)), end="")
+            if complex(x, y) == p:
+                print("p", end="")
+            else:
+                print(face(complex(x, y)), end="")
         else:
             print(" ", end="")
     print()
@@ -67,7 +80,9 @@ for y in range(1 + max(map(lambda z: int(z.imag), s))):
 exit()
 
 conversions = {
-    (1, 2): lambda p: (complex(TILE - 1 - int(p.real) % TILE, TILE - 1), 1j),
+    (1, 2): lambda p: (TILE - 1 - complex(int(p.real) % TILE, fcs[2][0].imag), 1j),
+    (1, 3): lambda p: (complex(int(p.imag) % TILE + fcs[3][1].real, fcs[3][0].imag), 1j),
+    (1, 6): lambda p: (complex(fcs[6][1].real, fcs[6][0].imag + TILE - 1 - int(p.imag) % TILE), -1),
 }
 
 

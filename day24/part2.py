@@ -46,29 +46,31 @@ for i in range(math.lcm(W - 2, H - 2)):
     ws.append({e[0] for e in w})
     w = move(w)
 
-t0 = 1
-while 1 + 1j in ws[t0]:
-    t0 += 1
 
-q = collections.deque([(0 + 0j, 0)])
+def bfs(t0, pi, pf):
+    q = collections.deque([(pi, 0)])
+    s = set()
+    for t in itertools.count(t0 + 1):
+        nq = collections.deque()
+        while len(q):
+            e = q.popleft()
+            if e[0] not in ws[t % len(ws)]:
+                if (e[0], t % len(ws)) not in s:
+                    nq.append((e[0], t % len(ws)))
+                    s.add((e[0], t % len(ws)))
+            for d in dir.values():
+                if e[0] + d in m and e[0] + d not in ws[t % len(ws)]:
+                    if (e[0] + d, t % len(ws)) not in s:
+                        nq.append((e[0] + d, t % len(ws)))
+                        s.add((e[0] + d, t % len(ws)))
+        q = nq
+        if pf in set(e[0] for e in q):
+            return t
 
-s = set()
-for t in itertools.count(1):
-    nq = collections.deque()
-    while len(q):
-        e = q.popleft()
-        if e[0] not in ws[t % len(ws)]:
-            if (e[0], t % len(ws)) not in s:
-                nq.append((e[0], t % len(ws)))
-                s.add((e[0], t % len(ws)))
-        for d in dir.values():
-            if e[0] + d in m and e[0] + d not in ws[t % len(ws)]:
-                if (e[0] + d, t % len(ws)) not in s:
-                    nq.append((e[0] + d, t % len(ws)))
-                    s.add((e[0] + d, t % len(ws)))
-    q = nq
-    if complex(W - 2, H - 2) in set(e[0] for e in q):
-        break
+t1 = bfs(0, 0, complex(W - 2, H - 2))
 
+t2 = bfs(t1 + 1, complex(W - 2, H - 2), 1 + 1j)
 
-print(t + 1)
+t3 = bfs(t2 + 1, 0, complex(W - 2, H - 2))
+
+print(t3 + 1)                                                                       

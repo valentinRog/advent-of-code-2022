@@ -8,26 +8,11 @@ v = {
     "2": 2,
 }
 
-def compute(s):
-    res = 0
-    for i, c in enumerate(reversed(s)):
-        res += v[c] * 5 ** i
-    return res
+def from_snafu(s):
+    return sum(v[c] * 5 ** i for i, c in enumerate(reversed(s)))
 
-def compute_reverse(n):
-    res = ""
-    while n:
-        if n % 5 <= 2:
-            res = str(n % 5) + res
-            n //= 5
-        else:
-            res = "-="[5 - n % 5 - 1] + res
-            n //= 5
-            n += 1
-    return res
+def to_snafu(n, s=""):
+    n, m = divmod(n, 5)
+    return to_snafu(n + (m > 2), "012=-"[m] + s) if n or m else s
 
-res = 0
-for line in sys.stdin.read().strip().splitlines():
-  res += compute(line)
-print(compute_reverse(res))
-
+print(to_snafu(sum(from_snafu(line) for line in sys.stdin.read().strip().splitlines())))

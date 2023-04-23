@@ -1,6 +1,6 @@
 import sys
 import functools
-from itertools import permutations
+import collections
 
 data = {
     line.split()[1]: {
@@ -10,17 +10,38 @@ data = {
     for line in sys.stdin.read().strip().splitlines()
 }
 
+
 @functools.cache
-def best(t=0, valve="AA", opened=None):
-    if opened is None:
-        opened = tuple()
-    if t == 30:
+def dist(a, b):
+    q = collections.deque([(a, 0)])
+    visited = set()
+    while True:
+        node, d = q.popleft()
+        if b in data[node]["nb"]:
+            return d + 1
+        for node in filter(lambda e: e not in visited, data[node]["nb"]):
+            q.append((node, d + 1))
+            visited.add(node)
+
+
+valves = [k for k, v in data.items() if v["rate"]]
+
+T = 30
+
+
+@functools.cache
+def dfs(t=0, valve="AA", opened=0):
+    if t == T:
         return 0
-    score = sum([data[e]["rate"] for e in opened])
-    s1 = 0
-    if data[valve]["rate"] and valve not in opened:
-        s1 = best(t + 1, valve, tuple(sorted(opened + (valve,))))
-    s2 = max(best(t + 1, v, opened) for v in data[valve]["nb"])
-    return score + max(s1, s2)
-  
-print(best())
+    score = sum(
+        data[e]["rate"]
+        for i, e in enumerate(valves) if opened & 1 << i
+    )
+    res = (T-t)*score
+    for v in filter(lambda x: not opened & 1 << x, range(len(valves))):
+        d = min(dist(valve, valves[v]) + 1, T - t)
+        res = max(res, dfs(t + d, valves[v], opened | 1 << v) + d*score)
+    return res
+
+
+print(dfs())

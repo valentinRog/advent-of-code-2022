@@ -1,6 +1,6 @@
 import sys
 import functools
-from itertools import permutations
+import collections
 
 data = {
     line.split()[1]: {
@@ -10,73 +10,50 @@ data = {
     for line in sys.stdin.read().strip().splitlines()
 }
 
-TICK = 26
 
-def dist(a, b, s=None):
-    if s is None:
-        s = tuple()
-    if a == b:
-        return 0
-    return 1 + min((dist(x, b, tuple(s + (a,))) for x in data[a]["nb"] if x not in s), default=100)
+@functools.cache
+def dist(a, b):
+    q = collections.deque([(a, 0)])
+    visited = set()
+    while True:
+        node, d = q.popleft()
+        if b in data[node]["nb"]:
+            return d + 1
+        for node in filter(lambda e: e not in visited, data[node]["nb"]):
+            q.append((node, d + 1))
+            visited.add(node)
 
 
-for k in data.keys():
-    data[k]["dist"] = {
-        o: dist(k, o)
-        for o in data.keys()
-    }
+valves = [k for k, v in data.items() if v["rate"]]
 
-keys = list(filter(lambda x: data[x]["rate"] > 0, data.keys()))
-path = []
-arr = [(0, ["AA"])]
-while len(arr):
-    new_arr = []
-    for e in arr:
-        for k in keys:
-            if k not in e[1]:
-                tmp = e[1] + [k]
-                cost = data[tmp[-2]]["dist"][tmp[-1]] + 1
-                path.append(tmp)
-                if e[0] + cost <= TICK or len(tmp) == len(keys) + 1:
-                    path.append(tmp)
-                if e[0] + cost < TICK and len(tmp) != len(keys) + 1:
-                    new_arr.append((e[0] + cost, tmp))
-    arr = list(new_arr)
+T = 26
 
-def score(p):
-    rates = [0]
-    res = 0
-    d = data[p[0]]["dist"][p[1]]
-    for tick in range(TICK):
-        res += sum(rates)
-        if d:
-            d -= 1
-        else:
-            p = p[1:]
-            d = data[p[0]]["dist"][p[1]] if len(p) > 1 else 0
-            if len(p):
-                rates.append(data[p[0]]["rate"])
-    return res
+paths = []
 
-print(len(path))
 
-bitset = []
+def dfs(t=0, valve="AA", opened=0, score=0):
+    global res
+    if t == T:
+        paths.append((score, opened))
+        return
+    s = sum(
+        data[e]["rate"]
+        for i, e in enumerate(valves) if opened & 1 << i
+    )
+    for v in filter(lambda x: not opened & 1 << x, range(len(valves))):
+        d = min(dist(valve, valves[v]) + 1, T - t)
+        dfs(t + d, valves[v], opened | 1 << v, score + d*s)
+    paths.append((score + (T-t)*s, opened))
 
-path = sorted(path, key=functools.cmp_to_key(lambda x, y: score(x) - score(y)), reverse=True)
 
-for e in path:
-    n = 0
-    for v in e[1:]:
-        n += 1 << keys.index(v)
-    bitset.append(n)
-
-scores = [score(p) for p in path]
-
+dfs()
+paths.sort(reverse=True)
 res = 0
-for i1 in range(len(path)):
-    for i2 in range(len(path)):
-        if not (bitset[i1] & bitset[i2]):
-            if (x := scores[i1] + scores[i2]) > res:
-                res = x
+for s1, o1 in paths:
+    for s2, o2 in paths:
+        if not o1 & o2:
+            res = max(res, s1 + s2)
+            break
+        if s1 + s2 < res:
             break
 print(res)

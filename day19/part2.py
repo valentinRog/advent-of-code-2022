@@ -1,126 +1,68 @@
 import sys
-import functools
+from collections import deque
+
+
+def parse_bp(s: str):
+    dq = deque(map(int, filter(str.isnumeric, s.replace(".", "").split())))
+    return [
+        (dq.popleft(), 0, 0, 0),
+        (dq.popleft(), 0, 0, 0),
+        (dq.popleft(), dq.popleft(), 0, 0),
+        (dq.popleft(), 0, dq.popleft(), 0),
+    ]
+
 
 data = [
-    {
-        "ore": int(line.split()[6]),
-        "clay": int(line.split()[12]),
-        "obsidian": (int(line.split()[18]), int(line.split()[21])),
-        "geode": (int(line.split()[27]), int(line.split()[30])),
-    }
+    parse_bp(line)
     for line in sys.stdin.read().strip().splitlines()
 ]
 
-def best(
-    ore_ore,
-    clay_ore,
-    obsidian_ore,
-    obsidian_clay,
-    geode_ore,
-    geode_obsidian
-):
 
-    @functools.cache
-    def compute(
-            ore=0,
-            clay=0,
-            obsidian=0,
-            geode=0,
-            ore_rob=1,
-            clay_rob=0,
-            obsidian_rob=0,
-            geode_rob=0,
-            t=0
-    ):
+def best(bp):
 
-        if t == 32:
-            return geode
-        arr = []
+    T_MAX = 32
+    cache = {}
+    current_best = 0
 
-        if ore >= geode_ore and obsidian >= geode_obsidian:
-            return compute(
-                ore + ore_rob - geode_ore,
-                clay + clay_rob,
-                obsidian + obsidian_rob - geode_obsidian,
-                geode + geode_rob,
-                ore_rob,
-                clay_rob,
-                obsidian_rob,
-                geode_rob + 1,
-                t + 1
+    def compute(mats, robs, t):
+        nonlocal current_best
+
+        dt = T_MAX - t
+        if mats[-1] + robs[-1] * dt + (dt - 1) * dt // 2 <= current_best:
+            return 0
+
+        if (mats, robs) in cache:
+            n, tt = cache[(mats, robs)]
+            if t >= tt:
+                return 0
+            cache[(mats, robs)] = (n, t)
+
+        if t == T_MAX:
+            current_best = max(current_best, mats[-1])
+            return mats[-1]
+
+        res = 0
+        for i, rob_cost in enumerate(bp):
+            if any(map(lambda i: mats[i] < rob_cost[i], range(len(mats)))):
+                continue
+            new_mats = tuple(
+                v + robs[ii] - rob_cost[ii]
+                for ii, v in enumerate(mats)
             )
+            new_robs = (*robs[:i], robs[i] + 1, *robs[i+1:])
+            res = max(res, compute(new_mats, new_robs, t + 1))
 
-        if ore >= ore_ore:
-            arr.append(
-                compute(
-                    ore + ore_rob - ore_ore,
-                    clay + clay_rob,
-                    obsidian + obsidian_rob,
-                    geode + geode_rob,
-                    ore_rob + 1,
-                    clay_rob,
-                    obsidian_rob,
-                    geode_rob,
-                    t + 1)
-            )
-
-        if ore >= clay_ore:
-            arr.append(
-                compute(
-                    ore + ore_rob - clay_ore,
-                    clay + clay_rob,
-                    obsidian + obsidian_rob,
-                    geode + geode_rob,
-                    ore_rob,
-                    clay_rob + 1,
-                    obsidian_rob,
-                    geode_rob,
-                    t + 1)
-            )
-
-        if ore >= obsidian_ore and clay >= obsidian_clay:
-            arr.append(
-                compute(
-                    ore + ore_rob - obsidian_ore,
-                    clay + clay_rob - obsidian_clay,
-                    obsidian + obsidian_rob,
-                    geode + geode_rob,
-                    ore_rob,
-                    clay_rob,
-                    obsidian_rob + 1,
-                    geode_rob,
-                    t + 1)
-            )
-
-        if ore < ore_ore:
-            arr.append(
-                compute(
-                    ore + ore_rob,
-                    clay + clay_rob,
-                    obsidian + obsidian_rob,
-                    geode + geode_rob,
-                    ore_rob,
-                    clay_rob,
-                    obsidian_rob,
-                    geode_rob,
-                    t + 1
-                )
-            )
-        return max(arr)
-
-    return compute
+        new_mats = tuple(
+            v + robs[i]
+            for i, v in enumerate(mats)
+        )
+        res = max(res, compute(new_mats, robs, t + 1))
+        cache[(mats, robs)] = (res, t)
+        return res
+    return compute(tuple([0] * 4), (1, 0, 0, 0), 0)
 
 
 res = 1
-for i, line in enumerate(data, 1):
-    res *= best(
-        line["ore"],
-        line["clay"],
-        line["obsidian"][0],
-        line["obsidian"][1],
-        line["geode"][0],
-        line["geode"][1],
-    )()
-    if i == 3:
-        break
+for bp in data[:3]:
+    res *= best(bp)
 print(res)
